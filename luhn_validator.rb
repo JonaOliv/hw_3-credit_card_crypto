@@ -13,6 +13,7 @@ module LuhnValidator
 
     (nums_a.reverse.each_slice(2).flat_map do |odd, even|
       [odd.to_i, *(even.to_i * 2).divmod(10)]
-    end.inject(:+) % 10).zero?
+    end.reduce(:+) % 10).zero?
+    # :+, it is like a abbr for |n1, n2| n1 + n2
   end
 end
