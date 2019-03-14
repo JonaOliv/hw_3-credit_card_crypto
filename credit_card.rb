@@ -1,6 +1,8 @@
 require_relative './luhn_validator.rb'
 require 'json'
+# frozen_string_literal: true
 
+## Object CreditCard
 class CreditCard
   # TODO: mixin the LuhnValidator using an 'include' statement
   include LuhnValidator
@@ -20,10 +22,10 @@ class CreditCard
   def to_json
     {
       # TODO: setup the hash with all instance vairables to serialize into json
-      :number => @number,
-      :expiration_date => @expiration_date,
-      :owner => @owner,
-      :credit_network => @credit_network
+      number: @number,
+      expiration_date: @expiration_date,
+      owner: @owner,
+      credit_network: @credit_network
     }.to_json
   end
 
@@ -36,7 +38,7 @@ class CreditCard
   def self.from_s(card_s)
     # TODO: deserializing a CreditCard object
     card_a = JSON.parse(card_s)
-    initialize("number", "expiration_date", "owner", "credit_network")
+    initialize(card_a)
   end
 
   # return a hash of the serialized credit card object
@@ -53,6 +55,6 @@ class CreditCard
     # TODO: implement this method
     #   - Use sha256 from openssl to create a cryptographically secure hash.
     #   - Credit cards with identical information should produce the same hash
-    OpenSSL::Digest.digest("SHA256", to_s)
+    OpenSSL::Digest.digest('SHA256', to_s)
   end
 end
