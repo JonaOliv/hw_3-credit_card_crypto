@@ -20,31 +20,19 @@ module SubstitutionCipher
   end
 
   module Permutation
-    #convert document to json_string
-    def self.to_json_string(c_card)
-      {
-        # TODO: setup the hash with all instance vairables to serialize into json
-        "number": c_card.number,
-        "expiration_date": c_card.expiration_date,
-        "owner": c_card.owner,
-        "credit_network": c_card.credit_network
-      }.to_json
-    end
-
     # Encrypts document using key
     # Arguments:
     #   document: String
     #   key: Fixnum (integer)
     # Returns: String
-    @keyword = 'ruby'
+
+    @keyword = 'rubyaws' #permutation keyword/order.
 
     def self.encrypt(document, key)
       # TODO: encrypt string using a permutation cipher
 
       # convert obj to json string
       document = Permutation.to_json_string(document)
-
-      print "document = #{document}"
 
       # generate lookup table
       lookup_tbl = {}
@@ -59,13 +47,13 @@ module SubstitutionCipher
       end
 
       # convert the keyword to int representation using the lookup_tbl
-      keyword = []
-      @keyword.split('').each { |val| keyword.push(lookup_tbl.key(val)) }
-      key = @keyword.to_s
+      keyword_fixnum = []
+      @keyword.split('').each { |val| keyword_fixnum.push(lookup_tbl[val]) }
+      key = keyword_fixnum
 
       # Grid document string to appropriate columns
       grid = []
-      (key + document).split('').each { |c| c != ' ' ? grid.push(c) : grid.push('@') }
+      (document).split('').each { |c| c != ' ' ? grid.push(c) : grid.push('@') }
 
       # check for grid empty slot and populate with dummy char
       if (grid.size % key.size) != 0
@@ -74,8 +62,10 @@ module SubstitutionCipher
         end
       end
 
-      # slice up gride to create multidimensional array
+      # slice up array(grid) to create multidimensional array
       grid = grid.each_slice(key.size).to_a
+
+      grid.unshift(key)
 
       # sort grid by column header(key)
       grid = grid.transpose.sort
@@ -118,13 +108,13 @@ module SubstitutionCipher
       end
 
       # convert the keyword to int representation using the lookup_tbl
-      keyword = []
-      @keyword.split('').each { |val| keyword.push(lookup_tbl.key(val)) }
-      key = @keyword.to_s
+      key_fixnum = []
+      @keyword.split('').each { |val| key_fixnum.push(lookup_tbl[val]) }
+      key = key_fixnum
 
       # populate a grid table with key header and characters from document.
       grid = []
-      key.size > 1 ? key.split('').each { |i| grid.push(i) } : grid.push(key)
+      key.size > 1 ? key.each { |i| grid.push(i) } : grid.push(key)
       grid = grid.sort
       document.split('').each { |c| grid.push(c) }
 
@@ -133,7 +123,7 @@ module SubstitutionCipher
 
       # sort grid by column header(key) to form back keyword
       grid = grid.transpose
-      key_order = key.split('').to_a
+      key_order = key
       grid = grid.sort_by { |a| key_order.index(a[0]) }
       grid = grid.transpose
 
@@ -154,8 +144,19 @@ module SubstitutionCipher
           end
         end
       end
-      
+
       return decipher_string
+    end
+
+    #convert document to json_string
+    def self.to_json_string(c_card)
+      {
+        # TODO: setup the hash with all instance vairables to serialize into json
+        "number": c_card.number,
+        "expiration_date": c_card.expiration_date,
+        "owner": c_card.owner,
+        "credit_network": c_card.credit_network
+      }.to_json
     end
   end
 end
