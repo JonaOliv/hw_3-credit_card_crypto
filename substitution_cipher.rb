@@ -25,9 +25,7 @@ module SubstitutionCipher
     #   document: String
     #   key: Fixnum (integer)
     # Returns: String
-
-    @keyword = 'rubyaws' #permutation keyword/order.
-
+ 
     def self.encrypt(document, key)
       # TODO: encrypt string using a permutation cipher
 
@@ -35,53 +33,19 @@ module SubstitutionCipher
       document = Permutation.to_json_string(document)
 
       # generate lookup table
-      lookup_tbl = {}
-      h_key = ('a'..'z').to_a
-      h_val = (1..127).to_a
-      h_val = h_val.shuffle(random: Random.new(key)) # shuffle using key
-      v = 0
+      lookup_tbl = generate_lookup_tbl
 
-      h_key.each do |k|
-        lookup_tbl[k] = h_val[v]
-        v += 1
-      end
+      # convert the document to int representation using the lookup_tbl
+      org_doc_fixnum = []
+      document.split('').each { |k| org_doc_fixnum.push(lookup_tbl[k]) }
 
-      # convert the keyword to int representation using the lookup_tbl
-      keyword_fixnum = []
-      @keyword.split('').each { |val| keyword_fixnum.push(lookup_tbl[val]) }
-      key = keyword_fixnum
+      # generate a shuffle value lookup table
+      shuff_lookup_tbl = Permutation.shuffle_lookup_tbl(lookup_tbl,key)
 
-      # Grid document string to appropriate columns
-      grid = []
-      (document).split('').each { |c| c != ' ' ? grid.push(c) : grid.push('@') }
-
-      # check for grid empty slot and populate with dummy char
-      if (grid.size % key.size) != 0
-        1.upto(key.size - (grid.size % key.size)) do
-          grid.push('#')
-        end
-      end
-
-      # slice up array(grid) to create multidimensional array
-      grid = grid.each_slice(key.size).to_a
-
-      grid.unshift(key)
-
-      # sort grid by column header(key)
-      grid = grid.transpose.sort
-      grid = grid.transpose
-
-      # Remove (header)key from grid
-      grid.shift
-
-      # Extract cipher values from grid, row after row ###.
-      cipher_string = ''
-
-      grid.each do |sub_array|
-        sub_array.each do |item|
-          cipher_string += item
-        end
-      end
+      # convert the org_doc_fixnum to string using the suffled lookup_tbl
+      cipher_string = []
+      org_doc_fixnum.each { |val| cipher_string.push(shuff_lookup_tbl.key(val.to_i)) }
+      cipher_string = cipher_string.join('')
 
       return cipher_string
     end
@@ -96,59 +60,24 @@ module SubstitutionCipher
       # TODO: decrypt string using a permutation cipher
 
       # generate lookup table
-      lookup_tbl = {}
-      h_key = ('a'..'z').to_a
-      h_val = (1..127).to_a
-      h_val = h_val.shuffle(random: Random.new(key)) # shuffle using key
+      lookup_tbl = generate_lookup_tbl
 
-      v = 0
-      h_key.each do |k|
-        lookup_tbl[k] = h_val[v]
-        v += 1
-      end
+      # generate a shuffle value lookup table
+      shuff_lookup_tbl = Permutation.shuffle_lookup_tbl(lookup_tbl,key)
 
-      # convert the keyword to int representation using the lookup_tbl
-      key_fixnum = []
-      @keyword.split('').each { |val| key_fixnum.push(lookup_tbl[val]) }
-      key = key_fixnum
+      # convert the document to int representation using the shuff_lookup_tbl
+      cipher_fixnum = []
+      document.split('').each { |k| cipher_fixnum.push(shuff_lookup_tbl[k]) }
 
-      # populate a grid table with key header and characters from document.
-      grid = []
-      key.size > 1 ? key.each { |i| grid.push(i) } : grid.push(key)
-      grid = grid.sort
-      document.split('').each { |c| grid.push(c) }
-
-      # slice up ciphered document (grid) to multidimensional array
-      grid = grid.each_slice(key.size).to_a
-
-      # sort grid by column header(key) to form back keyword
-      grid = grid.transpose
-      key_order = key
-      grid = grid.sort_by { |a| key_order.index(a[0]) }
-      grid = grid.transpose
-
-      # Remove (header)key from grid
-      grid.shift
-
-      # Extract deciphered values from grid, row after row.
-      decipher_string = ''
-
-      grid.each do |sub_array|
-        sub_array.each do |item|
-          if item == '@'
-            decipher_string += ' '
-          elsif item == '#'
-            # do nothing
-          else
-            decipher_string += item
-          end
-        end
-      end
+      # convert the cipher_fixnum to string using the lookup_tbl
+      decipher_string = []
+      cipher_fixnum.each { |val| decipher_string.push(lookup_tbl.key(val.to_i)) }
+      decipher_string = decipher_string.join('')
 
       return decipher_string
     end
 
-    #convert document to json_string
+    # convert document to json_string
     def self.to_json_string(c_card)
       {
         # TODO: setup the hash with all instance vairables to serialize into json
@@ -157,6 +86,37 @@ module SubstitutionCipher
         "owner": c_card.owner,
         "credit_network": c_card.credit_network
       }.to_json
+    end
+
+    # create/generate a lookup table
+    def self.generate_lookup_tbl
+      lookup_tbl = {}
+      h_key = ('a'..'z').to_a + (('A'..'Z').to_a) + (('!'..'?').to_a) + (['{','}',' ','_'])
+      h_val = (0..127).to_a
+      v = 0
+
+      h_key.each do |k|
+        lookup_tbl[k] = h_val[v]
+        v += 1
+      end
+      return lookup_tbl
+    end
+
+    # shuffle the values of a lookup table
+    def self.shuffle_lookup_tbl(lookup_tbl,key)
+      shuff_lookup_tbl = {}
+      max_val = 0
+      lookup_tbl.max_by{|k,v| max_val = v}
+      h_key = ('a'..'z').to_a + (('A'..'Z').to_a) + (('!'..'?').to_a) + (['{','}',' ','_'])
+      h_val2 =(0..max_val).to_a
+      h_val2 = h_val2.shuffle(random: Random.new(key)) # shuffle values using key
+      v = 0
+
+      h_key.each do |k|
+        shuff_lookup_tbl[k] = h_val2[v]
+        v += 1
+      end
+      return shuff_lookup_tbl
     end
   end
 end
