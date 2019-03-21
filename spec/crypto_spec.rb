@@ -2,6 +2,7 @@
 
 require_relative '../credit_card'
 require_relative '../substitution_cipher'
+require_relative '../double_transposition'
 require 'minitest/autorun'
 
 describe 'Test card info encryption' do
@@ -10,7 +11,7 @@ describe 'Test card info encryption' do
                          'Soumya Ray', 'Visa')
     @key = 3
   end
-
+=begin
   describe 'Using Caesar cipher' do
     it 'should encrypt card information' do
       enc = SubstitutionCipher::Caesar.encrypt(@cc, @key)
@@ -24,7 +25,7 @@ describe 'Test card info encryption' do
       dec.must_equal @cc.to_s
     end
   end
-
+=end
   describe 'Using Permutation cipher' do
     it 'should encrypt card information' do
       enc = SubstitutionCipher::Permutation.encrypt(@cc, @key)
@@ -41,4 +42,17 @@ describe 'Test card info encryption' do
 
   # TODO: Add tests for double transposition and modern symmetric key ciphers
   #       Can you DRY out the tests using metaprogramming? (see lecture slide)
+  describe 'Using Double Transposition cipher' do
+    it 'should encrypt card information' do
+      enc = SubstitutionCipher::DoubleTranspo.encrypt(@cc, @key)
+      enc.wont_equal @cc.to_s
+      enc.wont_be_nil
+    end
+
+    it 'should decrypt text' do
+      enc = SubstitutionCipher::DoubleTranspo.encrypt(@cc, @key)
+      dec = SubstitutionCipher::DoubleTranspo.decrypt(enc, @key)
+      dec.must_equal @cc.to_s
+    end
+  end
 end
