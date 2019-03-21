@@ -11,8 +11,8 @@ describe 'Test card info encryption' do
                          'Soumya Ray', 'Visa')
     @key = 3
     class << self
-      ['caesar', 'permutation', 'double_trans'].each do |action|
-    	  define_method("encrypt_#{action}") do |cc, key, cipher:|
+      %w[caesar permutation double_trans].each do |action|
+        define_method("encrypt_#{action}") do |cc, key, cipher:|
           enc = cipher.encrypt(cc, key)
           enc.wont_equal cc.to_s
           enc.wont_be_nil
