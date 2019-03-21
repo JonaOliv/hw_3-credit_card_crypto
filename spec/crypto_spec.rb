@@ -2,6 +2,7 @@
 
 require_relative '../credit_card'
 require_relative '../substitution_cipher'
+require_relative '../double_trans_cipher'
 require 'minitest/autorun'
 
 describe 'Test card info encryption' do
@@ -9,33 +10,50 @@ describe 'Test card info encryption' do
     @cc = CreditCard.new('4916603231464963', 'Mar-30-2020',
                          'Soumya Ray', 'Visa')
     @key = 3
+    class << self
+      ['caesar', 'permutation', 'double_trans'].each do |action|
+    	  define_method("encrypt_#{action}") do |cc, key, cipher:|
+          enc = cipher.encrypt(cc, key)
+          enc.wont_equal cc.to_s
+          enc.wont_be_nil
+        end
+
+        define_method("decrypt_#{action}") do |cc, key, cipher:|
+          enc = cipher.encrypt(cc, key)
+          dec = cipher.decrypt(enc, key)
+          dec.must_equal cc.to_s
+        end
+      end
+    end
   end
 
   describe 'Using Caesar cipher' do
     it 'should encrypt card information' do
-      enc = SubstitutionCipher::Caesar.encrypt(@cc, @key)
-      enc.wont_equal @cc.to_s
-      enc.wont_be_nil
+      encrypt_caesar(@cc, @key, cipher: SubstitutionCipher::Caesar)
     end
 
     it 'should decrypt text' do
-      enc = SubstitutionCipher::Caesar.encrypt(@cc, @key)
-      dec = SubstitutionCipher::Caesar.decrypt(enc, @key)
-      dec.must_equal @cc.to_s
+      decrypt_caesar(@cc, @key, cipher: SubstitutionCipher::Caesar)
     end
   end
 
-  describe 'Using Permutation cipher' do
+  # describe 'Using Permutation cipher' do
+  #   it 'should encrypt card information' do
+  #     encrypt_permutation(@cc, @key, cipher: SubstitutionCipher::Permutation)
+  #   end
+  #
+  #   it 'should decrypt text' do
+  #     decrypt_permutation(@cc, @key, cipher: SubstitutionCipher::Permutation)
+  #   end
+  # end
+
+  describe 'Using Double Transposition' do
     it 'should encrypt card information' do
-      enc = SubstitutionCipher::Permutation.encrypt(@cc, @key)
-      enc.wont_equal @cc.to_s
-      enc.wont_be_nil
+      encrypt_double_trans(@cc, @key, cipher: DoubleTranspositionCipher)
     end
 
     it 'should decrypt text' do
-      enc = SubstitutionCipher::Permutation.encrypt(@cc, @key)
-      dec = SubstitutionCipher::Permutation.decrypt(enc, @key)
-      dec.must_equal @cc.to_s
+      decrypt_double_trans(@cc, @key, cipher: DoubleTranspositionCipher)
     end
   end
 
