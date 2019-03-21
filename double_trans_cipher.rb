@@ -22,9 +22,6 @@ module DoubleTranspositionCipher
 
     key = handle_key_double_transposition_cipher(key)
 
-    # https://stackoverflow.com/questions/23047911/how-to-shuffle-an-array-the-same-way-every-time
-    # https://stackoverflow.com/questions/29522377/reverse-an-array-shufflerandom-to-get-the-original/29524063
-
     a_letters.shuffle!(random: Random.new(key))
 
     a_letters.map! { |e| e.shuffle!(random: Random.new(key)) }

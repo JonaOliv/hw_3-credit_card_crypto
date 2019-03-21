@@ -37,15 +37,15 @@ describe 'Test card info encryption' do
     end
   end
 
-  # describe 'Using Permutation cipher' do
-  #   it 'should encrypt card information' do
-  #     encrypt_permutation(@cc, @key, cipher: SubstitutionCipher::Permutation)
-  #   end
-  #
-  #   it 'should decrypt text' do
-  #     decrypt_permutation(@cc, @key, cipher: SubstitutionCipher::Permutation)
-  #   end
-  # end
+  describe 'Using Permutation cipher' do
+    it 'should encrypt card information' do
+      encrypt_permutation(@cc, @key, cipher: SubstitutionCipher::Permutation)
+    end
+
+    it 'should decrypt text' do
+      decrypt_permutation(@cc, @key, cipher: SubstitutionCipher::Permutation)
+    end
+  end
 
   describe 'Using Double Transposition' do
     it 'should encrypt card information' do
