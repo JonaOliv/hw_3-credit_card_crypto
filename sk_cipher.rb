@@ -1,4 +1,5 @@
-require 'rbnacl/libsodium'
+#require 'rbnacl/libsodium'
+require 'rbnacl'
 require 'base64'
 
 module ModernSymmetricCipher
