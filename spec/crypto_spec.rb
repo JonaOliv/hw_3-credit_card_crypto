@@ -11,6 +11,7 @@ describe 'Test card info encryption' do
     @cc = CreditCard.new('4916603231464963', 'Mar-30-2020',
                          'Soumya Ray', 'Visa')
     @key = 3
+    @key2 = ModernSymmetricCipher.generate_new_key
     class << self
       %w[caesar permutation double_trans modern_symmetric].each do |action|
         define_method("encrypt_#{action}") do |cc, key, cipher:|
@@ -60,11 +61,11 @@ describe 'Test card info encryption' do
 
   describe 'Using Modern Symmetric' do
     it 'should encrypt card information' do
-      encrypt_modern_symmetric(@cc, ModernSymmetricCipher.generate_new_key, cipher: ModernSymmetricCipher)
+      encrypt_modern_symmetric(@cc, @key2, cipher: ModernSymmetricCipher)
     end
 
     it 'should decrypt text' do
-      decrypt_modern_symmetric(@cc, ModernSymmetricCipher.generate_new_key, cipher: ModernSymmetricCipher)
+      decrypt_modern_symmetric(@cc, @key2, cipher: ModernSymmetricCipher)
     end
   end
 
