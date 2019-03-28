@@ -3,6 +3,7 @@
 require_relative '../credit_card'
 require_relative '../substitution_cipher'
 require_relative '../double_trans_cipher'
+require_relative '../sk_cipher'
 require 'minitest/autorun'
 
 describe 'Test card info encryption' do
@@ -11,7 +12,7 @@ describe 'Test card info encryption' do
                          'Soumya Ray', 'Visa')
     @key = 3
     class << self
-      %w[caesar permutation double_trans].each do |action|
+      %w[caesar permutation double_trans modern_symmetric].each do |action|
         define_method("encrypt_#{action}") do |cc, key, cipher:|
           enc = cipher.encrypt(cc, key)
           enc.wont_equal cc.to_s
@@ -54,6 +55,16 @@ describe 'Test card info encryption' do
 
     it 'should decrypt text' do
       decrypt_double_trans(@cc, @key, cipher: DoubleTranspositionCipher)
+    end
+  end
+
+  describe 'Using Modern Symmetric' do
+    it 'should encrypt card information' do
+      encrypt_modern_symmetric(@cc, @key, cipher: ModernSymmetricCipher)
+    end
+
+    it 'should decrypt text' do
+      decrypt_modern_symmetric(@cc, @key, cipher: ModernSymmetricCipher)
     end
   end
 

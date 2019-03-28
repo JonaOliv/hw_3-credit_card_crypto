@@ -1,4 +1,5 @@
 require 'rbnacl/libsodium'
+require 'base64'
 
 module ModernSymmetricCipher
   def self.generate_new_key
