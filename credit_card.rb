@@ -1,5 +1,7 @@
 require_relative './luhn_validator.rb'
 require 'json'
+require 'rbnacl'
+require 'base64'
 # frozen_string_literal: true
 
 ## Object CreditCard
@@ -55,6 +57,6 @@ class CreditCard
     # TODO: implement this method
     #   - Use sha256 from openssl to create a cryptographically secure hash.
     #   - Credit cards with identical information should produce the same hash
-    OpenSSL::Digest.digest('SHA256', to_s)
+    RbNaCl::Hash.sha256(to_s)
   end
 end
