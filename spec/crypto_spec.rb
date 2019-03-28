@@ -60,11 +60,11 @@ describe 'Test card info encryption' do
 
   describe 'Using Modern Symmetric' do
     it 'should encrypt card information' do
-      encrypt_modern_symmetric(@cc, @key, cipher: ModernSymmetricCipher)
+      encrypt_modern_symmetric(@cc, ModernSymmetricCipher.generate_new_key, cipher: ModernSymmetricCipher)
     end
 
     it 'should decrypt text' do
-      decrypt_modern_symmetric(@cc, @key, cipher: ModernSymmetricCipher)
+      decrypt_modern_symmetric(@cc, ModernSymmetricCipher.generate_new_key, cipher: ModernSymmetricCipher)
     end
   end
 
